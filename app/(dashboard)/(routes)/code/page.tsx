@@ -13,7 +13,6 @@ import { Input } from '@/components/ui/input';
 import axios from 'axios';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-//import { useProModal } from "@/hooks/use-pro-modal";
 import OpenAI from 'openai';
 import { ChatCompletionRequestMessage } from 'openai';
 import { cn } from '@/lib/utils';
@@ -21,11 +20,13 @@ import { Empty } from '@/components/empty';
 import { UserAvatar } from '@/components/user-avatar';
 import { BotAvatar } from '@/components/bot-avatar';
 import ReactMarkdown from 'react-markdown';
+import { ProModal } from '@/components/pro-modal';
+import { useProModal } from '@/hooks/use-pro-model';
 //import { toast } from "react-hot-toast";
 
 const CodePage = () => {
   const router = useRouter();
-  //const proModal = useProModal();
+  const proModal = useProModal();
   const [messages, setMessages] = useState<ChatCompletionRequestMessage[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -52,7 +53,9 @@ const CodePage = () => {
 
       form.reset();
     } catch (error: any) {
-      console.log(error);
+      if (error?.response?.status === 403) {
+        proModal.onOpen();
+      }
     } finally {
       router.refresh();
     }
